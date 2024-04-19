@@ -1,18 +1,23 @@
 import os
+from FourierAlgorithm import fourier_transform
+import cv2
 
-# Path to the dataset folder
+
 dataset_folder = 'C:\\Users\\Denisa\\Desktop\\Diploma Project\\Diploma-Project\\Fourier_Medicine_App\\MIET\\resources'
 
+for disease_folder in os.listdir(dataset_folder):
+    disease_path = os.path.join(dataset_folder, disease_folder)
 
-# Traverse the dataset folder and its subfolders
-for root, dirs, files in os.walk(dataset_folder):
-    for file in files:
-        # Check if the file is an image (jpg, png, jpeg)
-        if file.lower().endswith(('.jpg', '.jpeg', '.png')):
-            # Construct the full path to the image file
-            image_file = os.path.join(root, file)
+    for image_file in os.listdir(disease_path):
+        image_path = os.path.join(disease_path, image_file)
 
-            # Process the image file as needed (Just to test: will print the path to each image file)
-            print("Image File:", image_file)
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
+        if image is not None:
+            disease_info = {'disease': disease_folder, 'image_path': image_path}
+
+            f_transform = fourier_transform(image)
+
+        else:
+            print(f"Failed to load image: {image_path}")
 
