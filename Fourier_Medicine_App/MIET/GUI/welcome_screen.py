@@ -2,40 +2,39 @@ import tkinter as tk
 
 from MIET.GUI.login_register_screen import create_login_register_screen
 
+background_image = None
+logo_image = None
 
-def show_login_register_screen():
 
-    welcome_frame.pack_forget()
-
+def show_login_register_screen(root):
+    root.destroy()
     create_login_register_screen()
 
 
 def create_welcome_screen():
+    global background_image, logo_image
 
     root = tk.Tk()
-    root.title("Welcome to Your App")
-    root.geometry("1500x1000")
+    root.title("Welcome to ImaGenius")
+    root.geometry("1633x980")
 
-    background_image = tk.PhotoImage(file="screen2.png")
+    background_image = tk.PhotoImage(file="poza1.png")
 
-    canvas = tk.Canvas(root, width=1500, height=1000)
+    canvas = tk.Canvas(root, width=1633, height=900)
     canvas.pack(fill="both", expand=True)
     canvas.create_image(0, 0, anchor="nw", image=background_image)
 
-    global welcome_frame
-    welcome_frame = tk.Frame(canvas, bg="#FDFDFD")
+    welcome_frame = tk.Frame(canvas, bg="white")
     welcome_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-    logo_image = tk.PhotoImage(file="doctor.png")  # Replace with your image file
-    logo_label = tk.Label(welcome_frame, image=logo_image, bg="#FDFDFD", fg="black")
-    logo_label.image = logo_image  # Retain a reference to the image object
+    logo_image = tk.PhotoImage(file="doctor.png")
+    logo_label = tk.Label(welcome_frame, image=logo_image, bg="white")
     logo_label.pack(pady=20)
 
-    app_name_label = tk.Label(welcome_frame, text="ImaGenius", font=("Times New Roman", 50), bg="#FDFDFD", fg="black")
+    app_name_label = tk.Label(welcome_frame, text="ImaGenius", font=("Times New Roman", 75, "bold"), bg="white")
     app_name_label.pack(pady=10)
 
-    root.after(5000, show_login_register_screen)
-
+    root.after(5000, lambda: show_login_register_screen(root))
     root.mainloop()
 
 
