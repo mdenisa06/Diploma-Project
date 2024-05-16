@@ -3,7 +3,7 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 
 
-class FourierTransformScreen:
+class ImageEnhancementScreen:
     def __init__(self, root):
         self.root = root
         self.root.title("Image Enhancement")
@@ -50,7 +50,7 @@ class FourierTransformScreen:
 
 def main():
     root = tk.Tk()
-    app = FourierTransformScreen(root)
+    app = ImageEnhancementScreen(root)
     root.mainloop()
 
 
