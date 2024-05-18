@@ -2,33 +2,44 @@ import tkinter as tk
 from tkinter import PhotoImage, Entry
 from tkinter import messagebox
 from register import register_account
+from login import login_account
 
 
 def register():
-    # Get input values
     name = register_entry_name.get()
     last_name = register_entry_last_name.get()
     doctor_id = register_entry_doctor_id.get()
     password = register_entry_password.get()
 
-    # Validate input
     if not name or not last_name or not doctor_id or not password:
         messagebox.showerror("Error", "Please fill in all fields.")
         return
 
-    # Register account using Firebase
     if register_account(doctor_id, password):
-        # Clear input fields
+
         register_entry_name.delete(0, tk.END)
         register_entry_last_name.delete(0, tk.END)
         register_entry_doctor_id.delete(0, tk.END)
         register_entry_password.delete(0, tk.END)
 
-        # Show success message
         messagebox.showinfo("Success", "Account created.")
+    else:
+        messagebox.showerror("Error", "Email already exists.")
 
 
-def create_login_register_screen(login=None):
+def login():
+    email = login_entry_username.get()
+    password = login_entry_password.get()
+
+    message = login_account(email, password)
+
+    if message == "Login successful":
+        messagebox.showinfo("Success", message)
+    else:
+        messagebox.showerror("Error", message)
+
+
+def create_login_register_screen():
     root = tk.Tk()
     root.title("Login or Create Account")
     root.geometry("1633x980")
@@ -41,6 +52,8 @@ def create_login_register_screen(login=None):
     # Login Part
     login_label = tk.Label(root, text="Login Form", font=("Times New Roman", 35, "bold"), bg="white")
     login_label.place(relx=0.25, rely=0.3, anchor="center")
+
+    global login_entry_username, login_entry_password
 
     username_label = tk.Label(root, text="Username:", font=("Times New Roman", 15, "bold"), bg="white")
     username_label.place(relx=0.15, rely=0.45, anchor="center")
@@ -89,4 +102,3 @@ def create_login_register_screen(login=None):
 
 if __name__ == "__main__":
     create_login_register_screen()
-

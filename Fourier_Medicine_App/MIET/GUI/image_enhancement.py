@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog
+import numpy as np
+from scipy.fft import fft2, ifft2, fftshift, ifftshift
 from PIL import Image, ImageTk
+import cv2
 
 
 class ImageEnhancementScreen:
@@ -40,12 +43,45 @@ class ImageEnhancementScreen:
 
     def load_image(self, file_path):
         image = Image.open(file_path)
-        image = image.resize((300, 300), Image.ANTIALIAS)
+        self.original_image = np.array(image)
+        if len(self.original_image.shape) == 3:
+            self.original_image = cv2.cvtColor(self.original_image, cv2.COLOR_RGB2BGR)
         self.photo = ImageTk.PhotoImage(image)
         self.image_preview_label.config(image=self.photo)
 
     def enhance_image(self):
-        pass
+        if hasattr(self, 'original_image'):
+            enhanced_image = self.enhance_fourier(self.original_image)
+            self.display_enhanced_image(enhanced_image)
+        else:
+            print("Please select an image first.")
+
+    def enhance_fourier(self, image):
+
+        if len(image.shape) == 3:
+            gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray_img = image.copy()
+
+        freq_domain = np.fft.fft2(gray_img)
+
+        rows, cols = gray_img.shape
+        crow, ccol = rows // 2, cols // 2
+        mask = np.ones((rows, cols), np.uint8)
+        mask[crow - 30:crow + 30, ccol - 30:ccol + 30] = 0
+
+        freq_domain_filtered = freq_domain * mask
+
+        spatial_domain = np.fft.ifft2(freq_domain_filtered)
+
+        enhanced_img = np.abs(spatial_domain).astype(np.uint8)
+
+        return enhanced_img
+
+    def display_enhanced_image(self, enhanced_image):
+        enhanced_image = Image.fromarray(enhanced_image)
+        self.enhanced_photo = ImageTk.PhotoImage(enhanced_image)
+        self.image_preview_label.config(image=self.enhanced_photo)
 
 
 def main():
