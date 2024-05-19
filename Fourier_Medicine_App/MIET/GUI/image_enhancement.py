@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog
 import numpy as np
-from scipy.fft import fft2, ifft2, fftshift, ifftshift
 from PIL import Image, ImageTk
 import cv2
+from enhanced_image_screen import create_enhanced_photo_screen
 
 
 class ImageEnhancementScreen:
@@ -21,38 +21,50 @@ class ImageEnhancementScreen:
         self.image_frame.place(relx=0.5, rely=0.5, anchor="center")
 
         self.instructions_label = tk.Label(self.image_frame, text="Drag and drop an image here or click the button to "
-                                                                  "select an image.", bg="white", font=("Times New "
-                                                                                                        "Roman", 20))
-        self.instructions_label.grid(row=0, column=0, columnspan=2, pady=20)
+                                                                  "select an image from device.", bg="white",
+                                           font=("Times New Roman", 20))
+        self.instructions_label.grid(row=0, column=0, columnspan=4, pady=20)
+
+        self.padding_label = tk.Label(self.image_frame, bg="white")
+        self.padding_label.grid(row=1, column=0, padx=(10, 0))
 
         self.image_preview_label = tk.Label(self.image_frame, bg="white")
-        self.image_preview_label.grid(row=1, column=0, columnspan=2, pady=20)
+        self.image_preview_label.grid(row=1, column=1, pady=20, sticky="w")
+
+        self.filename_label = tk.Label(self.image_frame, text="", bg="white", font=("Times New Roman", 12))
+        self.filename_label.grid(row=1, column=2, pady=20, sticky="w")
 
         self.select_button = tk.Button(self.image_frame, text="Select Image", bg="white", font=("Times New Roman", 15),
                                        command=self.browse_image)
-        self.select_button.grid(row=2, column=0, padx=10)
+        self.select_button.grid(row=2, column=1, padx=10, pady=(0, 20), sticky="w")
 
         self.enhance_button = tk.Button(self.image_frame, text="Enhance Image", bg="white",
-                                        font=("Times New Roman", 15), command=self.enhance_image)
-        self.enhance_button.grid(row=2, column=1, padx=10)
+                                        font=("Times New Roman", 15),
+                                        command=self.enhance_image)
+        self.enhance_button.grid(row=2, column=2, padx=10, pady=(0, 20), sticky="w")
 
     def browse_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")])
         if file_path:
             self.load_image(file_path)
+            self.filename_label.config(text=f"Selected Image: {file_path.split('/')[-1]}")
 
     def load_image(self, file_path):
         image = Image.open(file_path)
         self.original_image = np.array(image)
         if len(self.original_image.shape) == 3:
             self.original_image = cv2.cvtColor(self.original_image, cv2.COLOR_RGB2BGR)
+
+        thumbnail_size = (100, 100)
+        image.thumbnail(thumbnail_size)
         self.photo = ImageTk.PhotoImage(image)
         self.image_preview_label.config(image=self.photo)
 
     def enhance_image(self):
         if hasattr(self, 'original_image'):
             enhanced_image = self.enhance_fourier(self.original_image)
-            self.display_enhanced_image(enhanced_image)
+            further_enhanced_image = self.apply_sharpening(enhanced_image)
+            self.open_enhanced_image_screen(further_enhanced_image)
         else:
             print("Please select an image first.")
 
@@ -78,10 +90,18 @@ class ImageEnhancementScreen:
 
         return enhanced_img
 
-    def display_enhanced_image(self, enhanced_image):
+    def apply_sharpening(self, image):
+
+        kernel = np.array([[0, -1, 0],
+                           [-1, 5, -1],
+                           [0, -1, 0]])
+
+        sharpened_img = cv2.filter2D(image, -1, kernel)
+        return sharpened_img
+
+    def open_enhanced_image_screen(self, enhanced_image):
         enhanced_image = Image.fromarray(enhanced_image)
-        self.enhanced_photo = ImageTk.PhotoImage(enhanced_image)
-        self.image_preview_label.config(image=self.enhanced_photo)
+        create_enhanced_photo_screen(enhanced_image)
 
 
 def main():
