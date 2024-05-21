@@ -48,6 +48,7 @@ class ImageEnhancementScreen:
         if file_path:
             self.load_image(file_path)
             self.filename_label.config(text=f"Selected Image: {file_path.split('/')[-1]}")
+            self.file_path = file_path
 
     def load_image(self, file_path):
         image = Image.open(file_path)
@@ -69,39 +70,31 @@ class ImageEnhancementScreen:
             print("Please select an image first.")
 
     def enhance_fourier(self, image):
-
         if len(image.shape) == 3:
             gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         else:
             gray_img = image.copy()
 
         freq_domain = np.fft.fft2(gray_img)
-
         rows, cols = gray_img.shape
         crow, ccol = rows // 2, cols // 2
         mask = np.ones((rows, cols), np.uint8)
         mask[crow - 30:crow + 30, ccol - 30:ccol + 30] = 0
-
         freq_domain_filtered = freq_domain * mask
-
         spatial_domain = np.fft.ifft2(freq_domain_filtered)
-
         enhanced_img = np.abs(spatial_domain).astype(np.uint8)
-
         return enhanced_img
 
     def apply_sharpening(self, image):
-
         kernel = np.array([[0, -1, 0],
                            [-1, 5, -1],
                            [0, -1, 0]])
-
         sharpened_img = cv2.filter2D(image, -1, kernel)
         return sharpened_img
 
     def open_enhanced_image_screen(self, enhanced_image):
         enhanced_image = Image.fromarray(enhanced_image)
-        create_enhanced_photo_screen(enhanced_image)
+        create_enhanced_photo_screen(enhanced_image, self.file_path)
 
 
 def main():

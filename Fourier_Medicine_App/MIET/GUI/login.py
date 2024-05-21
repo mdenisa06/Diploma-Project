@@ -15,7 +15,9 @@ def login_account(email, password):
     response = requests.post(url, json=payload)
 
     if response.status_code == 200:
-        return "Login successful"
+        user_info = response.json()
+        uid = user_info.get('localId')
+        return "Login successful", uid
     else:
         error_message = response.json().get('error', {}).get('message', '')
         if error_message == 'INVALID_LOGIN_CREDENTIALS':

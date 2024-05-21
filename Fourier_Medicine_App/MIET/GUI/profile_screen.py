@@ -1,11 +1,10 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-
-from MIET.GUI.login_register_screen import create_login_register_screen
+from firebase_admin import firestore
 
 
 class ProfileScreen:
-    def __init__(self, root):
+    def __init__(self, root, uid):
         self.root = root
         self.root.title("Profile")
         self.root.geometry("1633x980")
@@ -22,32 +21,49 @@ class ProfileScreen:
                                       font=("Times New Roman", 30))
         self.profile_label.pack(pady=20)
 
-        self.name_label = tk.Label(self.profile_frame, text="Name: John Doe", bg="white",
-                                   font=("Times New Roman", 20))
-        self.name_label.pack()
+        # Fetch user information
+        self.user_info = self.get_user_info(uid)
+        if self.user_info:
+            name = self.user_info.get("name", "N/A")
+            last_name = self.user_info.get("last_name", "N/A")
+            doctor_id = self.user_info.get("doctor_id", "N/A")
 
-        self.email_label = tk.Label(self.profile_frame, text="Doctor ID: #12212", bg="white",
-                                    font=("Times New Roman", 20))
-        self.email_label.pack()
+            self.name_label = tk.Label(self.profile_frame, text=f"Name: {name} {last_name}", bg="white",
+                                       font=("Times New Roman", 20))
+            self.name_label.pack()
 
-        self.phone_label = tk.Label(self.profile_frame, text="Hospital Department: Neurology", bg="white",
-                                    font=("Times New Roman", 20))
-        self.phone_label.pack()
+            self.email_label = tk.Label(self.profile_frame, text=f"Doctor ID: {doctor_id}", bg="white",
+                                        font=("Times New Roman", 20))
+            self.email_label.pack()
+
+            self.phone_label = tk.Label(self.profile_frame, text="Hospital Department: Neurology", bg="white",
+                                        font=("Times New Roman", 20))
+            self.phone_label.pack()
+        else:
+            self.name_label = tk.Label(self.profile_frame, text="Error fetching profile information", bg="white",
+                                       font=("Times New Roman", 20))
+            self.name_label.pack()
 
         self.logout_button = tk.Button(self.profile_frame, text="Logout", bg="white",
                                        font=("Times New Roman", 15), command=self.logout)
         self.logout_button.pack(pady=20)
 
-    def logout(self):
-        self.root.destroy()
-        create_login_register_screen()
+    def get_user_info(self, uid):
+        try:
+            db = firestore.client()
+            user_ref = db.collection('users').document(uid)
+            user_doc = user_ref.get()
+            if user_doc.exists:
+                return user_doc.to_dict()
+            else:
+                print("No such document.")
+                return None
+        except Exception as e:
+            print(f"Error fetching user data: {e}")
+            return None
 
 
-def main():
+def create_profile_screen(user_id):
     root = tk.Tk()
-    app = ProfileScreen(root)
+    app = ProfileScreen(root, user_id)
     root.mainloop()
-
-
-if __name__ == "__main__":
-    main()

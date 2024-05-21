@@ -3,7 +3,9 @@ from tkinter import PhotoImage, Entry
 from tkinter import messagebox
 from register import register_account
 from login import login_account
+from profile_screen import ProfileScreen
 
+current_user_info = {}
 
 def register():
     name = register_entry_name.get()
@@ -15,7 +17,7 @@ def register():
         messagebox.showerror("Error", "Please fill in all fields.")
         return
 
-    if register_account(doctor_id, password):
+    if register_account(name, last_name, doctor_id, password):
 
         register_entry_name.delete(0, tk.END)
         register_entry_last_name.delete(0, tk.END)
@@ -30,16 +32,19 @@ def register():
 def login():
     email = login_entry_username.get()
     password = login_entry_password.get()
-
-    message = login_account(email, password)
-
-    if message == "Login successful":
-        messagebox.showinfo("Success", message)
+    result = login_account(email, password)
+    if isinstance(result, tuple) and len(result) >= 2:
+        message, uid = result
+        if message == "Login successful":
+            messagebox.showinfo("Success", message)
+        else:
+            messagebox.showerror("Error", message)
     else:
-        messagebox.showerror("Error", message)
+        messagebox.showerror("Error", "Unexpected error occurred during login.")
 
 
 def create_login_register_screen():
+    global root
     root = tk.Tk()
     root.title("Login or Create Account")
     root.geometry("1633x980")
