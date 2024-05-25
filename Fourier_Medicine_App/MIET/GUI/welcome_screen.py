@@ -1,20 +1,13 @@
 import tkinter as tk
 
-from MIET.GUI.login_register_screen import create_login_register_screen
 
-background_image = None
-logo_image = None
-
-
-def show_login_register_screen(root):
-    root.destroy()
-    create_login_register_screen()
+def show_login_register_screen(callback):
+    callback()
 
 
-def create_welcome_screen():
+def create_welcome_screen(root, callback):
     global background_image, logo_image
 
-    root = tk.Tk()
     root.title("Welcome to ImaGenius")
     root.geometry("1633x980")
 
@@ -34,9 +27,10 @@ def create_welcome_screen():
     app_name_label = tk.Label(welcome_frame, text="ImaGenius", font=("Times New Roman", 75, "bold"), bg="white")
     app_name_label.pack(pady=10)
 
-    root.after(5000, lambda: show_login_register_screen(root))
-    root.mainloop()
+    root.after(5000, lambda: show_login_register_screen(callback))
 
 
 if __name__ == "__main__":
-    create_welcome_screen()
+    root = tk.Tk()
+    create_welcome_screen(root, lambda: print("Callback after welcome screen"))
+    root.mainloop()

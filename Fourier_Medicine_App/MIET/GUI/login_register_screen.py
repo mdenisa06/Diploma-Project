@@ -1,60 +1,50 @@
 import tkinter as tk
-from tkinter import PhotoImage, Entry
-from tkinter import messagebox
+from tkinter import PhotoImage, Entry, messagebox
 from register import register_account
 from login import login_account
-from profile_screen import ProfileScreen
-
-current_user_info = {}
-
-def register():
-    name = register_entry_name.get()
-    last_name = register_entry_last_name.get()
-    doctor_id = register_entry_doctor_id.get()
-    password = register_entry_password.get()
-
-    if not name or not last_name or not doctor_id or not password:
-        messagebox.showerror("Error", "Please fill in all fields.")
-        return
-
-    if register_account(name, last_name, doctor_id, password):
-
-        register_entry_name.delete(0, tk.END)
-        register_entry_last_name.delete(0, tk.END)
-        register_entry_doctor_id.delete(0, tk.END)
-        register_entry_password.delete(0, tk.END)
-
-        messagebox.showinfo("Success", "Account created.")
-    else:
-        messagebox.showerror("Error", "Email already exists.")
 
 
-def login():
-    email = login_entry_username.get()
-    password = login_entry_password.get()
-    result = login_account(email, password)
-    if isinstance(result, tuple) and len(result) >= 2:
-        message, uid = result
-        if message == "Login successful":
-            messagebox.showinfo("Success", message)
+def create_login_register_screen(root, on_login_success):
+    def register():
+        name = register_entry_name.get()
+        last_name = register_entry_last_name.get()
+        doctor_id = register_entry_doctor_id.get()
+        password = register_entry_password.get()
+
+        if not name or not last_name or not doctor_id or not password:
+            messagebox.showerror("Error", "Please fill in all fields.")
+            return
+
+        if register_account(name, last_name, doctor_id, password):
+            register_entry_name.delete(0, tk.END)
+            register_entry_last_name.delete(0, tk.END)
+            register_entry_doctor_id.delete(0, tk.END)
+            register_entry_password.delete(0, tk.END)
+            messagebox.showinfo("Success", "Account created.")
         else:
-            messagebox.showerror("Error", message)
-    else:
-        messagebox.showerror("Error", "Unexpected error occurred during login.")
+            messagebox.showerror("Error", "Email already exists.")
 
+    def login():
+        email = login_entry_username.get()
+        password = login_entry_password.get()
+        result = login_account(email, password)
+        if isinstance(result, tuple) and len(result) >= 2:
+            message, uid = result
+            if message == "Login successful":
+                messagebox.showinfo("Success", message)
+                on_login_success(uid)
+            else:
+                messagebox.showerror("Error", message)
+        else:
+            messagebox.showerror("Error", "Unexpected error occurred during login.")
 
-def create_login_register_screen():
-    global root
-    root = tk.Tk()
     root.title("Login or Create Account")
     root.geometry("1633x980")
-
-    image_path = PhotoImage(
-        file=r"C:\Users\Denisa\Desktop\Diploma Project\Diploma-Project\Fourier_Medicine_App\MIET\GUI\poza1.png")
+    image_path = PhotoImage(file="poza1.png")
+    root.image_path = image_path
     bg_image = tk.Label(root, image=image_path)
     bg_image.place(x=0, y=0, relwidth=1, relheight=1)
 
-    # Login Part
     login_label = tk.Label(root, text="Login Form", font=("Times New Roman", 35, "bold"), bg="white")
     login_label.place(relx=0.25, rely=0.3, anchor="center")
 
@@ -73,7 +63,6 @@ def create_login_register_screen():
     login_button = tk.Button(root, text="Login", font=("Times New Roman", 10, "bold"), command=login)
     login_button.place(relx=0.25, rely=0.55, anchor="center")
 
-    # Register Part
     register_label = tk.Label(root, text="Register Form", font=("Times New Roman", 35, "bold"), bg="white")
     register_label.place(relx=0.75, rely=0.3, anchor="center")
 
@@ -102,8 +91,8 @@ def create_login_register_screen():
     register_button = tk.Button(root, text="Register", font=("Times New Roman", 10, "bold"), command=register)
     register_button.place(relx=0.75, rely=0.65, anchor="center")
 
-    root.mainloop()
-
 
 if __name__ == "__main__":
-    create_login_register_screen()
+    root = tk.Tk()
+    create_login_register_screen(root, lambda user_info: print(f"Logged in user info: {user_info}"))
+    root.mainloop()

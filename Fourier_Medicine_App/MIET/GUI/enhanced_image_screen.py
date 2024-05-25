@@ -3,13 +3,14 @@ from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 import os
 from firebase_admin import auth
-from profile_screen import ProfileScreen
+from profile_screen import create_profile_screen
 
 
 class EnhancedPhotoScreen:
     def __init__(self, root, enhanced_image, original_file_path, current_user_info):
         self.root = root
         self.root.title("Enhanced Photo")
+        self.root.geometry("1633x980")
         self.original_image = enhanced_image
         self.original_file_path = original_file_path
         self.current_user_info = current_user_info
@@ -18,7 +19,7 @@ class EnhancedPhotoScreen:
         self.frame = tk.Frame(root, bg="black", relief=tk.RAISED)
         self.frame.pack(fill="both", expand=True)
 
-        # Create a frame for the canvas
+        # Canvas Frame
         self.canvas_frame = tk.Frame(self.frame, bg="black", relief="sunken")
         self.canvas_frame.pack(side=tk.LEFT, fill="both", expand=True, padx=10, pady=10)
 
@@ -27,8 +28,7 @@ class EnhancedPhotoScreen:
         self.canvas.bind("<Configure>", self.on_canvas_resize)
 
         self.display_image()
-
-        # Create a frame for the buttons
+        # Button Frame
         self.button_frame = tk.Frame(self.frame, bg="black")
         self.button_frame.pack(side=tk.LEFT, padx=10, pady=10, fill="y")
 
@@ -45,7 +45,7 @@ class EnhancedPhotoScreen:
         self.save_button.pack(side=tk.TOP, padx=5, pady=5)
 
         self.profile_button = tk.Button(self.button_frame, text="Profile", command=self.open_profile_screen, width=15,
-                                        height=2, bg="white",fg="black")
+                                        height=2, bg="white", fg="black")
         self.profile_button.pack(side=tk.TOP, padx=5, pady=5)
 
     def on_canvas_resize(self, event):
@@ -71,30 +71,22 @@ class EnhancedPhotoScreen:
         self.display_image()
 
     def save_photo(self):
-        folder_path = r"C:\Users\Denisa\Desktop\Diploma Project\Diploma-Project\Fourier_Medicine_App\Enhanced images"
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
+        folder_path = r"C:\Users\Denisa\Desktop\Diploma Project\Diploma-Project\Fourier_Medicine_App\MIET\Enhancement Results"
+        os.makedirs(folder_path, exist_ok=True)
 
-        original_filename = os.path.basename(self.original_file_path)
-        file_path = os.path.join(folder_path, original_filename)
-        self.original_image.save(file_path)
-        messagebox.showinfo("Save Photo", f"Photo saved to {file_path}")
+        file_name = os.path.basename(self.original_file_path)
+        enhanced_image_path = os.path.join(folder_path, f"enhanced_{file_name}")
+        self.original_image.save(enhanced_image_path)
+        messagebox.showinfo("Image Saved", f"Enhanced image saved as {enhanced_image_path}")
 
     def open_profile_screen(self):
         if self.current_user_info:
-            root_profile = tk.Toplevel()
-            ProfileScreen(root_profile, self.current_user_info)
-            root_profile.mainloop()
+            root_profile = tk.Toplevel(self.root)
+            create_profile_screen(root_profile, self.current_user_info)
         else:
-            messagebox.showerror("Error", "No user logged in")
+            messagebox.showerror("Error", "No user logged in.")
 
 
-def create_enhanced_photo_screen(enhanced_image, original_file_path, current_user_info=None):
-    root = tk.Toplevel()
+def create_enhanced_photo_screen(root, enhanced_image, original_file_path, current_user_info):
     app = EnhancedPhotoScreen(root, enhanced_image, original_file_path, current_user_info)
-
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
-    root.geometry(f"{screen_width}x{screen_height}")
-
     root.mainloop()

@@ -1,16 +1,17 @@
 import tkinter as tk
-from tkinter import filedialog
-import numpy as np
+from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
-import cv2
+import os
 from enhanced_image_screen import create_enhanced_photo_screen
-
-
+import numpy as np
+import cv2
 class ImageEnhancementScreen:
-    def __init__(self, root):
+    def __init__(self, root, current_user_info, on_enhance):
         self.root = root
         self.root.title("Image Enhancement")
         self.root.geometry("1633x980")
+        self.current_user_info = current_user_info
+        self.on_enhance = on_enhance
 
         self.background_image = Image.open("poza1.png")
         self.background_photo = ImageTk.PhotoImage(self.background_image)
@@ -20,9 +21,9 @@ class ImageEnhancementScreen:
         self.image_frame = tk.Frame(root, bg="white")
         self.image_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-        self.instructions_label = tk.Label(self.image_frame, text="Drag and drop an image here or click the button to "
-                                                                  "select an image from device.", bg="white",
-                                           font=("Times New Roman", 20))
+        self.instructions_label = tk.Label(self.image_frame,
+                                           text="Drag and drop an image here or click the button to select an image from device.",
+                                           bg="white", font=("Times New Roman", 20))
         self.instructions_label.grid(row=0, column=0, columnspan=4, pady=20)
 
         self.padding_label = tk.Label(self.image_frame, bg="white")
@@ -39,8 +40,7 @@ class ImageEnhancementScreen:
         self.select_button.grid(row=2, column=1, padx=10, pady=(0, 20), sticky="w")
 
         self.enhance_button = tk.Button(self.image_frame, text="Enhance Image", bg="white",
-                                        font=("Times New Roman", 15),
-                                        command=self.enhance_image)
+                                        font=("Times New Roman", 15), command=self.enhance_image)
         self.enhance_button.grid(row=2, column=2, padx=10, pady=(0, 20), sticky="w")
 
     def browse_image(self):
@@ -93,15 +93,9 @@ class ImageEnhancementScreen:
         return sharpened_img
 
     def open_enhanced_image_screen(self, enhanced_image):
-        enhanced_image = Image.fromarray(enhanced_image)
-        create_enhanced_photo_screen(enhanced_image, self.file_path)
+        enhanced_image_pil = Image.fromarray(enhanced_image)
+        top_level = tk.Toplevel(self.root)
+        create_enhanced_photo_screen(top_level, enhanced_image_pil, self.file_path, self.current_user_info)
 
 
-def main():
-    root = tk.Tk()
-    app = ImageEnhancementScreen(root)
-    root.mainloop()
 
-
-if __name__ == "__main__":
-    main()
