@@ -2,13 +2,15 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from firebase_init import db
 
+
 class ProfileScreen:
-    def __init__(self, root, current_user_info):
+    def __init__(self, root, current_user_info, on_logout):
         self.root = root
         self.root.title("Profile")
         self.root.geometry("1633x980")
 
         self.current_user_info = current_user_info
+        self.on_logout = on_logout
 
         self.background_image = Image.open("poza1.png")
         self.background_photo = ImageTk.PhotoImage(self.background_image)
@@ -43,15 +45,16 @@ class ProfileScreen:
             self.email_label.pack()
         else:
             self.error_label = tk.Label(self.profile_frame, text="Error: Invalid user information", bg="white",
-                                         font=("Times New Roman", 20))
+                                        font=("Times New Roman", 20))
             self.error_label.pack()
 
     def logout(self):
-        self.root.destroy()
+        self.on_logout()
 
-def create_profile_screen(root, current_user_info):
+
+def create_profile_screen(root, current_user_info, on_logout):
     if current_user_info:
-        app = ProfileScreen(root, current_user_info)
+        app = ProfileScreen(root, current_user_info, on_logout)
         root.mainloop()
     else:
         print("Error: No current user information provided.")

@@ -3,7 +3,7 @@ from tkinter import messagebox
 from firebase_init import db
 from welcome_screen import create_welcome_screen
 from login_register_screen import create_login_register_screen
-from image_enhancement import ImageEnhancementScreen
+from image_enhancement import create_image_enhancement_screen
 from enhanced_image_screen import create_enhanced_photo_screen
 from profile_screen import create_profile_screen
 
@@ -47,15 +47,17 @@ class MainApp:
 
     def show_image_enhancement_screen(self):
         self.clear_screen()
-        ImageEnhancementScreen(self.root, self.current_user_info, self.show_enhanced_image_screen)
+        create_image_enhancement_screen(self.root, self.current_user_info, self.show_image_enhancement_screen,
+                                        self.show_login_register_screen)
 
     def show_enhanced_image_screen(self, enhanced_image, original_file_path):
         self.clear_screen()
-        create_enhanced_photo_screen(self.root, enhanced_image, original_file_path, self.current_user_info)
+        create_enhanced_photo_screen(self.root, enhanced_image, original_file_path, self.current_user_info,
+                                     self.show_image_enhancement_screen, self.show_login_register_screen)
 
     def show_profile_screen(self):
         self.clear_screen()
-        create_profile_screen(self.root, self.current_user_info)
+        create_profile_screen(self.root, self.current_user_info, self.show_login_register_screen)
 
     def clear_screen(self):
         for widget in self.root.winfo_children():

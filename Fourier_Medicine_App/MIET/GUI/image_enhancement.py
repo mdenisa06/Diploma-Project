@@ -5,13 +5,16 @@ import os
 from enhanced_image_screen import create_enhanced_photo_screen
 import numpy as np
 import cv2
+
+
 class ImageEnhancementScreen:
-    def __init__(self, root, current_user_info, on_enhance):
+    def __init__(self, root, current_user_info, on_enhance, on_logout):
         self.root = root
         self.root.title("Image Enhancement")
         self.root.geometry("1633x980")
         self.current_user_info = current_user_info
         self.on_enhance = on_enhance
+        self.on_logout = on_logout
 
         self.background_image = Image.open("poza1.png")
         self.background_photo = ImageTk.PhotoImage(self.background_image)
@@ -64,10 +67,11 @@ class ImageEnhancementScreen:
     def enhance_image(self):
         if hasattr(self, 'original_image'):
             enhanced_image = self.enhance_fourier(self.original_image)
-            further_enhanced_image = self.apply_sharpening(enhanced_image)
-            self.open_enhanced_image_screen(further_enhanced_image)
+            enhanced_image = self.apply_adaptive_sharpening(enhanced_image)
+            enhanced_image = self.apply_noise_reduction(enhanced_image)
+            self.open_enhanced_image_screen(enhanced_image)
         else:
-            print("Please select an image first.")
+            messagebox.showerror("Error", "Please select an image first.")
 
     def enhance_fourier(self, image):
         if len(image.shape) == 3:
@@ -79,23 +83,26 @@ class ImageEnhancementScreen:
         rows, cols = gray_img.shape
         crow, ccol = rows // 2, cols // 2
         mask = np.ones((rows, cols), np.uint8)
-        mask[crow - 30:crow + 30, ccol - 30:ccol + 30] = 0
+        mask[crow - 30:crow + 30, ccol - 30] = 0
         freq_domain_filtered = freq_domain * mask
         spatial_domain = np.fft.ifft2(freq_domain_filtered)
         enhanced_img = np.abs(spatial_domain).astype(np.uint8)
         return enhanced_img
 
-    def apply_sharpening(self, image):
-        kernel = np.array([[0, -1, 0],
-                           [-1, 5, -1],
-                           [0, -1, 0]])
-        sharpened_img = cv2.filter2D(image, -1, kernel)
-        return sharpened_img
+    def apply_adaptive_sharpening(self, image):
+        blurred = cv2.GaussianBlur(image, (5, 5), 10.0)
+        return cv2.addWeighted(image, 1.5, blurred, -0.5, 0)
+
+    def apply_noise_reduction(self, image):
+        return cv2.medianBlur(image, 3)
 
     def open_enhanced_image_screen(self, enhanced_image):
         enhanced_image_pil = Image.fromarray(enhanced_image)
         top_level = tk.Toplevel(self.root)
-        create_enhanced_photo_screen(top_level, enhanced_image_pil, self.file_path, self.current_user_info)
+        create_enhanced_photo_screen(top_level, enhanced_image_pil, self.file_path, self.current_user_info,
+                                     self.on_enhance, self.on_logout)
 
 
-
+def create_image_enhancement_screen(root, current_user_info, on_enhance, on_logout):
+    app = ImageEnhancementScreen(root, current_user_info, on_enhance, on_logout)
+    root.mainloop()

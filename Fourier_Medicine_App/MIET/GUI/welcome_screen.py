@@ -22,7 +22,7 @@ def create_welcome_screen(root, callback):
 
     logo_image = tk.PhotoImage(file="doctor.png")
     logo_label = tk.Label(welcome_frame, image=logo_image, bg="white")
-    logo_label.pack(pady=20)
+    logo_label.pack(pady=10)
 
     app_name_label = tk.Label(welcome_frame, text="ImaGenius", font=("Times New Roman", 75, "bold"), bg="white")
     app_name_label.pack(pady=10)

@@ -31,12 +31,11 @@ def create_login_register_screen(root, on_login_success):
         if isinstance(result, tuple) and len(result) >= 2:
             message, uid = result
             if message == "Login successful":
-                messagebox.showinfo("Success", message)
                 on_login_success(uid)
             else:
                 messagebox.showerror("Error", message)
         else:
-            messagebox.showerror("Error", "Unexpected error occurred during login.")
+            messagebox.showerror("Error", "An unexpected error occurred during login. Please try again.")
 
     root.title("Login or Create Account")
     root.geometry("1633x980")
