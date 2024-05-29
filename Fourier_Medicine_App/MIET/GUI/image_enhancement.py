@@ -3,18 +3,20 @@ from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 import os
 from enhanced_image_screen import create_enhanced_photo_screen
+from profile_screen import create_profile_screen
 import numpy as np
 import cv2
 
 
 class ImageEnhancementScreen:
-    def __init__(self, root, current_user_info, on_enhance, on_logout):
+    def __init__(self, root, current_user_info, on_enhance, on_logout, on_profile):
         self.root = root
         self.root.title("Image Enhancement")
         self.root.geometry("1633x980")
         self.current_user_info = current_user_info
         self.on_enhance = on_enhance
         self.on_logout = on_logout
+        self.on_profile = on_profile
 
         self.background_image = Image.open("poza1.png")
         self.background_photo = ImageTk.PhotoImage(self.background_image)
@@ -45,6 +47,11 @@ class ImageEnhancementScreen:
         self.enhance_button = tk.Button(self.image_frame, text="Enhance Image", bg="white",
                                         font=("Times New Roman", 15), command=self.enhance_image)
         self.enhance_button.grid(row=2, column=2, padx=10, pady=(0, 20), sticky="w")
+
+        # Add "Done Enhancing" button
+        self.done_button = tk.Button(self.image_frame, text="Done Enhancing", bg="white",
+                                     font=("Times New Roman", 15), command=self.on_profile)
+        self.done_button.grid(row=2, column=3, padx=10, pady=(0, 20), sticky="w")
 
     def browse_image(self):
         file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")])
@@ -103,6 +110,6 @@ class ImageEnhancementScreen:
                                      self.on_enhance, self.on_logout)
 
 
-def create_image_enhancement_screen(root, current_user_info, on_enhance, on_logout):
-    app = ImageEnhancementScreen(root, current_user_info, on_enhance, on_logout)
+def create_image_enhancement_screen(root, current_user_info,on_enhance, on_logout, on_profile):
+    app = ImageEnhancementScreen(root, current_user_info, on_enhance, on_logout, on_profile)
     root.mainloop()

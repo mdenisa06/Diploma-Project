@@ -48,7 +48,7 @@ class MainApp:
     def show_image_enhancement_screen(self):
         self.clear_screen()
         create_image_enhancement_screen(self.root, self.current_user_info, self.show_image_enhancement_screen,
-                                        self.show_login_register_screen)
+                                        self.show_login_register_screen, self.show_profile_screen)
 
     def show_enhanced_image_screen(self, enhanced_image, original_file_path):
         self.clear_screen()
