@@ -20,7 +20,6 @@ class EnhancedPhotoScreen:
         self.frame = tk.Frame(root, bg="black", relief=tk.RAISED)
         self.frame.pack(fill="both", expand=True)
 
-        # Canvas Frame
         self.canvas_frame = tk.Frame(self.frame, bg="black", relief="sunken")
         self.canvas_frame.pack(side=tk.LEFT, fill="both", expand=True, padx=10, pady=10)
 
@@ -29,7 +28,7 @@ class EnhancedPhotoScreen:
         self.canvas.bind("<Configure>", self.on_canvas_resize)
 
         self.display_image()
-        # Button Frame
+
         self.button_frame = tk.Frame(self.frame, bg="black")
         self.button_frame.pack(side=tk.LEFT, padx=10, pady=10, fill="y")
 

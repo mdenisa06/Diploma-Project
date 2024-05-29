@@ -1,3 +1,5 @@
+import os
+import sys
 import tkinter as tk
 
 
@@ -11,7 +13,16 @@ def create_welcome_screen(root, callback):
     root.title("Welcome to ImaGenius")
     root.geometry("1633x980")
 
-    background_image = tk.PhotoImage(file="poza1.png")
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    background_image_path = os.path.join(base_path, "poza1.png")
+    logo_image_path = os.path.join(base_path, "doctor.png")
+
+    background_image = tk.PhotoImage(file=background_image_path)
+    logo_image = tk.PhotoImage(file=logo_image_path)
 
     canvas = tk.Canvas(root, width=1633, height=900)
     canvas.pack(fill="both", expand=True)
@@ -20,7 +31,6 @@ def create_welcome_screen(root, callback):
     welcome_frame = tk.Frame(canvas, bg="white")
     welcome_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-    logo_image = tk.PhotoImage(file="doctor.png")
     logo_label = tk.Label(welcome_frame, image=logo_image, bg="white")
     logo_label.pack(pady=10)
 

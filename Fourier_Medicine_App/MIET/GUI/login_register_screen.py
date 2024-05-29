@@ -1,3 +1,5 @@
+import os
+import sys
 import tkinter as tk
 from tkinter import PhotoImage, Entry, messagebox
 from register import register_account
@@ -39,9 +41,15 @@ def create_login_register_screen(root, on_login_success):
 
     root.title("Login or Create Account")
     root.geometry("1633x980")
-    image_path = PhotoImage(file="poza1.png")
-    root.image_path = image_path
-    bg_image = tk.Label(root, image=image_path)
+
+    if hasattr(sys, '_MEIPASS'):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    image_path = os.path.join(base_path, "poza1.png")
+    root.image_path = PhotoImage(file=image_path)
+    bg_image = tk.Label(root, image=root.image_path)
     bg_image.place(x=0, y=0, relwidth=1, relheight=1)
 
     login_label = tk.Label(root, text="Login Form", font=("Times New Roman", 35, "bold"), bg="white")

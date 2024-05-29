@@ -1,5 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+import os
+import sys
 from firebase_init import db
 
 
@@ -12,7 +14,13 @@ class ProfileScreen:
         self.current_user_info = current_user_info
         self.on_logout = on_logout
 
-        self.background_image = Image.open("poza1.png")
+        if hasattr(sys, '_MEIPASS'):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+
+        background_image_path = os.path.join(base_path, "poza1.png")
+        self.background_image = Image.open(background_image_path)
         self.background_photo = ImageTk.PhotoImage(self.background_image)
         self.background_label = tk.Label(root, image=self.background_photo)
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)

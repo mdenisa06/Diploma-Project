@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 import os
+import sys
 from enhanced_image_screen import create_enhanced_photo_screen
 from profile_screen import create_profile_screen
 import numpy as np
@@ -18,7 +19,13 @@ class ImageEnhancementScreen:
         self.on_logout = on_logout
         self.on_profile = on_profile
 
-        self.background_image = Image.open("poza1.png")
+        if hasattr(sys, '_MEIPASS'):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+
+        background_image_path = os.path.join(base_path, "poza1.png")
+        self.background_image = Image.open(background_image_path)
         self.background_photo = ImageTk.PhotoImage(self.background_image)
         self.background_label = tk.Label(root, image=self.background_photo)
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
@@ -27,7 +34,7 @@ class ImageEnhancementScreen:
         self.image_frame.place(relx=0.5, rely=0.5, anchor="center")
 
         self.instructions_label = tk.Label(self.image_frame,
-                                           text="Drag and drop an image here or click the button to select an image from device.",
+                                           text="Click the button to select an image from device.",
                                            bg="white", font=("Times New Roman", 20))
         self.instructions_label.grid(row=0, column=0, columnspan=4, pady=20)
 
@@ -57,7 +64,7 @@ class ImageEnhancementScreen:
         file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")])
         if file_path:
             self.load_image(file_path)
-            self.filename_label.config(text=f"Selected Image: {file_path.split('/')[-1]}")
+            self.filename_label.config(text=f"Selected Image: {os.path.basename(file_path)}")
             self.file_path = file_path
 
     def load_image(self, file_path):
@@ -90,7 +97,7 @@ class ImageEnhancementScreen:
         rows, cols = gray_img.shape
         crow, ccol = rows // 2, cols // 2
         mask = np.ones((rows, cols), np.uint8)
-        mask[crow - 30:crow + 30, ccol - 30] = 0
+        mask[crow - 30:crow + 30, ccol - 30:ccol + 30] = 0
         freq_domain_filtered = freq_domain * mask
         spatial_domain = np.fft.ifft2(freq_domain_filtered)
         enhanced_img = np.abs(spatial_domain).astype(np.uint8)
@@ -110,6 +117,6 @@ class ImageEnhancementScreen:
                                      self.on_enhance, self.on_logout)
 
 
-def create_image_enhancement_screen(root, current_user_info,on_enhance, on_logout, on_profile):
+def create_image_enhancement_screen(root, current_user_info, on_enhance, on_logout, on_profile):
     app = ImageEnhancementScreen(root, current_user_info, on_enhance, on_logout, on_profile)
     root.mainloop()
