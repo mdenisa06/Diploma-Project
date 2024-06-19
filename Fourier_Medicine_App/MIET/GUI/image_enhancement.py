@@ -55,7 +55,6 @@ class ImageEnhancementScreen:
                                         font=("Times New Roman", 15), command=self.enhance_image)
         self.enhance_button.grid(row=2, column=2, padx=10, pady=(0, 20), sticky="w")
 
-        # Add "Done Enhancing" button
         self.done_button = tk.Button(self.image_frame, text="Done Enhancing", bg="white",
                                      font=("Times New Roman", 15), command=self.on_profile)
         self.done_button.grid(row=2, column=3, padx=10, pady=(0, 20), sticky="w")

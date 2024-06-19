@@ -59,6 +59,14 @@ class MainApp:
         self.clear_screen()
         create_profile_screen(self.root, self.current_user_info, self.show_login_register_screen)
 
+    def on_logout(self):
+        try:
+            self.current_user_info = None
+            self.show_login_register_screen()
+
+        except Exception as e:
+            print(f"Error logging out: {e}")
+
     def clear_screen(self):
         for widget in self.root.winfo_children():
             widget.destroy()
