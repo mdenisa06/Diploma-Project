@@ -3,10 +3,10 @@ from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 import os
 import sys
-from enhanced_image_screen import create_enhanced_photo_screen
-from profile_screen import create_profile_screen
 import numpy as np
 import cv2
+from skimage.metrics import structural_similarity as ssim
+from enhanced_image_screen import create_enhanced_photo_screen
 
 
 class ImageEnhancementScreen:
@@ -82,6 +82,13 @@ class ImageEnhancementScreen:
             enhanced_image = self.enhance_fourier(self.original_image)
             enhanced_image = self.apply_adaptive_sharpening(enhanced_image)
             enhanced_image = self.apply_noise_reduction(enhanced_image)
+
+            psnr_value = self.calculate_psnr(self.original_image, enhanced_image)
+            print(f"PSNR: {psnr_value:.2f}")
+
+            ssim_value = self.calculate_ssim(self.original_image, enhanced_image)
+            print(f"SSIM: {ssim_value:.4f}")
+
             self.open_enhanced_image_screen(enhanced_image)
         else:
             messagebox.showerror("Error", "Please select an image first.")
@@ -114,6 +121,17 @@ class ImageEnhancementScreen:
         top_level = tk.Toplevel(self.root)
         create_enhanced_photo_screen(top_level, enhanced_image_pil, self.file_path, self.current_user_info,
                                      self.on_enhance, self.on_logout)
+
+    def calculate_psnr(self, original_image, enhanced_image):
+        mse = np.mean((original_image - enhanced_image) ** 2)
+        if mse == 0:
+            return float('inf')
+        max_pixel = np.max(original_image)
+        psnr = 20 * np.log10(max_pixel / np.sqrt(mse))
+        return psnr
+
+    def calculate_ssim(self, original_image, enhanced_image):
+        return ssim(original_image, enhanced_image, data_range=enhanced_image.max() - enhanced_image.min())
 
 
 def create_image_enhancement_screen(root, current_user_info, on_enhance, on_logout, on_profile):
